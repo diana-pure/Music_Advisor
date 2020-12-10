@@ -1,18 +1,19 @@
-package advisor;
+package advisor.command;
 
-public class PlaylistsCommand implements Command {
+public class Playlists implements Command {
     private final String playlists;
 
-    public PlaylistsCommand(String playlists) {
+    public Playlists(String playlists) {
         this.playlists = playlists;
     }
 
     @Override
-    public void run() {
+    public Status run() {
         System.out.printf("---%s PLAYLISTS---\n", playlists.toUpperCase());
         System.out.println("Walk Like A Badass  ");
         System.out.println("Rage Beats  ");
         System.out.println("Arab Mood Booster  ");
         System.out.println("Sunday Stroll");
+        return Status.SUCCEED;
     }
 }

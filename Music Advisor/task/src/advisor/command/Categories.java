@@ -1,12 +1,13 @@
-package advisor;
+package advisor.command;
 
-public class CategoriesCommand implements Command {
+public class Categories implements Command {
     @Override
-    public void run() {
+    public Status run() {
         System.out.println("---CATEGORIES---");
         System.out.println("Top Lists");
         System.out.println("Pop");
         System.out.println("Mood");
         System.out.println("Latin");
+        return Status.SUCCEED;
     }
 }

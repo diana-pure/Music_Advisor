@@ -1,29 +1,13 @@
 package advisor;
 
-import java.util.Scanner;
-
 public class Main {
     public static void main(String[] args) {
-        Scanner s = new Scanner(System.in);
-
-        do {
-            switch (CommandType.fromString(s.next())) {
-                case FEATURED:
-                    new FeaturedCommand().run();
-                    break;
-                case NEW:
-                    new NewCommand().run();
-                    break;
-                case CATEGORIES:
-                    new CategoriesCommand().run();
-                    break;
-                case PLAYLISTS:
-                    new PlaylistsCommand(s.next()).run();
-                    break;
-                case EXIT:
-                    new ExitCommand().run();
-                    return;
-            }
-        } while (true);
+        MusicAdvisor musicAdvisor = args.length > 0 && "-access".equals(args[0])
+                ? new MusicAdvisor(args[1])
+                : new MusicAdvisor();
+        if (!musicAdvisor.authenticate()) {
+            return;
+        }
+        musicAdvisor.getAdvice();
     }
 }
