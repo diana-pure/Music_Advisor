@@ -1,17 +1,18 @@
 package advisor;
 
 import advisor.command.*;
+import advisor.command.parameter.AuthParameter;
 
 import java.util.Collections;
 import java.util.List;
 
 public class MusicAdvisor {
-    private static final String DEFAUTL_MUSIC_SERVICE_HOST = "https://accounts.spotify.com";
+    private static final String DEFAULT_MUSIC_SERVICE_HOST = "https://accounts.spotify.com";
     private final String musicServiceHost;
     private boolean isAuthenticated = false;
 
     public MusicAdvisor() {
-        musicServiceHost = DEFAUTL_MUSIC_SERVICE_HOST;
+        musicServiceHost = DEFAULT_MUSIC_SERVICE_HOST;
     }
 
     public MusicAdvisor(String musicServiceHost) {
@@ -25,7 +26,7 @@ public class MusicAdvisor {
             command = CommandParser.parse();
         }
         if (command instanceof Auth) {
-            return command.run().equals(Status.SUCCEED);
+            return command.run(new AuthParameter(musicServiceHost)).equals(Status.SUCCEED);
         }
         command.run();
         return false;

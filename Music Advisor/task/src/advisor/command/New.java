@@ -1,8 +1,10 @@
 package advisor.command;
 
+import advisor.command.parameter.CommandParameter;
+
 public class New implements Command {
     @Override
-    public Status run() {
+    public Status run(CommandParameter parameter) {
         System.out.println("---NEW RELEASES---");
         System.out.println("Mountains [Sia, Diplo, Labrinth]");
         System.out.println("Runaway [Lil Peep]");

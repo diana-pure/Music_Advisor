@@ -1,5 +1,7 @@
 package advisor.command;
 
+import advisor.command.parameter.CommandParameter;
+
 public class Playlists implements Command {
     private final String playlists;
 
@@ -8,7 +10,7 @@ public class Playlists implements Command {
     }
 
     @Override
-    public Status run() {
+    public Status run(CommandParameter parameter) {
         System.out.printf("---%s PLAYLISTS---\n", playlists.toUpperCase());
         System.out.println("Walk Like A Badass  ");
         System.out.println("Rage Beats  ");

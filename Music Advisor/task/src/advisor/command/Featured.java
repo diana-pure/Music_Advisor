@@ -1,9 +1,11 @@
 package advisor.command;
 
+import advisor.command.parameter.CommandParameter;
+
 public class Featured implements Command {
 
     @Override
-    public Status run() {
+    public Status run(CommandParameter parameter) {
         System.out.println("---FEATURED---");
         System.out.println("Mellow Morning");
         System.out.println("Wake Up and Smell the Coffee");
