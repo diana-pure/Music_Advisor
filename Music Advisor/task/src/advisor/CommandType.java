@@ -1,4 +1,4 @@
-package advisor.command;
+package advisor;
 
 public enum CommandType {
     AUTH("auth"),

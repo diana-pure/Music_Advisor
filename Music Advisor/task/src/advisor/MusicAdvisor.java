@@ -1,44 +1,70 @@
 package advisor;
 
-import advisor.command.*;
-import advisor.command.parameter.AuthParameter;
+import advisor.model.Category;
+import advisor.model.Representable;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
+
+import static advisor.CommandType.AUTH;
+import static advisor.CommandType.EXIT;
 
 public class MusicAdvisor {
-    private static final String DEFAULT_MUSIC_SERVICE_HOST = "https://accounts.spotify.com";
-    private final String musicServiceHost;
-    private boolean isAuthenticated = false;
+    private MusicServiceClient client;
+    private Scanner scanner = new Scanner(System.in);
 
     public MusicAdvisor() {
-        musicServiceHost = DEFAULT_MUSIC_SERVICE_HOST;
+        client = new SpotifyClient();
     }
 
-    public MusicAdvisor(String musicServiceHost) {
-        this.musicServiceHost = musicServiceHost;
+    public MusicAdvisor(String authHost, String apiHost) {
+        client = new SpotifyClient(authHost, apiHost);
     }
 
     public boolean authenticate() {
-        Command command = CommandParser.parse();
-        while (!(command instanceof Auth) && !(command instanceof Exit)) {
+        CommandType command = getNextCommand();
+        while (command != AUTH && command != EXIT) {
             System.out.println("Please, provide access for application.");
-            command = CommandParser.parse();
+            command = getNextCommand();
         }
-        if (command instanceof Auth) {
-            return command.run(new AuthParameter(musicServiceHost)).equals(Status.SUCCEED);
+
+        switch (command) {
+            case EXIT:
+                return false;
+            case AUTH:
+                client.authenticate();
         }
-        command.run();
-        return false;
+
+        return true;
     }
 
-    public List<String> getAdvice() {
-        Command command = CommandParser.parse();
-        while (!(command instanceof Exit)) {
-            command.run();
-            command = CommandParser.parse();
+    public void getAdvice() {
+        CommandType command = getNextCommand();
+        while (command != EXIT) {
+            switch (command) {
+                case FEATURED:
+                    client.getFeatured();
+                    break;
+                case NEW:
+                    client.getNew();
+                    break;
+                case CATEGORIES:
+                    print(client.getCategories());
+                    break;
+                case PLAYLISTS:
+                    client.getPlaylists(new Category("",""));
+            }
+            command = getNextCommand();
         }
-        command.run();
-        return Collections.emptyList();
+    }
+
+    private CommandType getNextCommand() {
+        return CommandType.fromString(scanner.next());
+    }
+
+    private void print(List<? extends Representable> resp) {
+        for (Representable r : resp) {
+            System.out.println(r.represent());
+        }
     }
 }
