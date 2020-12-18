@@ -1,8 +1,8 @@
 package advisor;
 
+import advisor.model.Album;
 import advisor.model.Category;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import advisor.model.Playlist;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpServer;
@@ -13,7 +13,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +22,9 @@ public class SpotifyClient implements MusicServiceClient {
     private static final String AUTH_PATH = "/authorize";
     private static final String API_TOKEN_PATH = "/api/token";
     private static final String CATEGORIES_PATH = "/v1/browse/categories";
+    private static final String NEW_RELEASES_PATH = "/v1/browse/new-releases";
+    private static final String PLAYLISTS_PATH = "/v1/browse/categories/{category_id}/playlists";
+    private static final String FEATURED_PATH = "/v1/browse/featured-playlists";
 
     private static final String BASIC_AUTHORIZATION_HEADER = "Basic MWVhZDFiNDExN2FhNDNmM2FmZTIyMmZlNmRkZWQ5YzQ6ZjNkNTk1N2UyMjNmNGNiNGE3ZWVkZGZlZDRlMDc1ZGY=";
     private static final String CLIENT_ID = "1ead1b4117aa43f3afe222fe6dded9c4";
@@ -53,21 +55,9 @@ public class SpotifyClient implements MusicServiceClient {
     }
 
     public List<Category> getCategories() {
-        HttpRequest request = HttpRequest.newBuilder()
-                .header("Authorization", "Bearer " + authentication.getAccessToken())
-                .uri(URI.create(apiMediaHost + CATEGORIES_PATH))
-                .GET()
-                .build();
         try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println("---CATEGORIES---");
-            JsonObject jo = JsonParser.parseString(response.body()).getAsJsonObject();
-            JsonArray ja = jo.get("categories").getAsJsonObject().get("items").getAsJsonArray();
-            List<Category> cats = new ArrayList<>(ja.size());
-            for(JsonElement e : ja){
-                cats.add(new Category(e.getAsJsonObject().get("id").getAsString(), e.getAsJsonObject().get("name").getAsString()));
-            }
-            return cats;
+            HttpResponse<String> response = httpClient.send(getRequest(CATEGORIES_PATH), HttpResponse.BodyHandlers.ofString());
+            return Category.fromString(response.body());
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
@@ -75,17 +65,36 @@ public class SpotifyClient implements MusicServiceClient {
     }
 
     @Override
-    public void getPlaylists(Category category) {
-
+    public List<Playlist> getPlaylists(Category category) {
+        try {
+            HttpResponse<String> response = httpClient.send(getRequest(PLAYLISTS_PATH), HttpResponse.BodyHandlers.ofString());
+            return Playlist.fromString(response.body());
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override
-    public void getFeatured() {
+    public List<Playlist> getFeatured() {
+        try {
+            HttpResponse<String> response = httpClient.send(getRequest(FEATURED_PATH), HttpResponse.BodyHandlers.ofString());
+            return Playlist.fromString(response.body());
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override
-    public void getNew() {
-
+    public List<Album> getNewReleases() {
+        try {
+            HttpResponse<String> response = httpClient.send(getRequest(NEW_RELEASES_PATH), HttpResponse.BodyHandlers.ofString());
+            return Album.fromString(response.body());
+        } catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     private String getUserAcceptanceCode() {
@@ -143,5 +152,13 @@ public class SpotifyClient implements MusicServiceClient {
             e.printStackTrace();
         }
         return new Authentication(accessToken, refreshToken);
+    }
+
+    private HttpRequest getRequest(String path) {
+        return HttpRequest.newBuilder()
+                .header("Authorization", "Bearer " + authentication.getAccessToken())
+                .uri(URI.create(apiMediaHost + path))
+                .GET()
+                .build();
     }
 }

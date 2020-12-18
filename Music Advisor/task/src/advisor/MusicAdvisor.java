@@ -43,16 +43,16 @@ public class MusicAdvisor {
         while (command != EXIT) {
             switch (command) {
                 case FEATURED:
-                    client.getFeatured();
+                    print(client.getFeatured());
                     break;
                 case NEW:
-                    client.getNew();
+                    print(client.getNewReleases());
                     break;
                 case CATEGORIES:
                     print(client.getCategories());
                     break;
                 case PLAYLISTS:
-                    client.getPlaylists(new Category("",""));
+                    print(client.getPlaylists(new Category("","")));
             }
             command = getNextCommand();
         }
