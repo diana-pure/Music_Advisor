@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Playlist implements Representable {
@@ -20,9 +21,12 @@ public class Playlist implements Representable {
     }
 
     public static List<Playlist> fromString(String plain) {
-
         JsonObject jo = JsonParser.parseString(plain).getAsJsonObject();
-        JsonArray ja = jo.get("playlists").getAsJsonObject().get("items").getAsJsonArray();
+        JsonElement je = jo.get("playlists");
+        if(je == null) {
+            return Collections.emptyList();
+        }
+        JsonArray ja = je.getAsJsonObject().get("items").getAsJsonArray();
         List<Playlist> playlists = new ArrayList<>(ja.size());
         for (JsonElement e : ja) {
             String ref = e.getAsJsonObject().get("external_urls").getAsJsonObject().get("spotify").getAsString();

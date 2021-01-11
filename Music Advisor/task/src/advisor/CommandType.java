@@ -20,8 +20,11 @@ public enum CommandType {
             case "featured": return FEATURED;
             case "new": return NEW;
             case "categories": return CATEGORIES;
-            case "playlists": return PLAYLISTS;
-            default: return EXIT;
+            default:
+                if(s.startsWith("playlists")) {
+                    return PLAYLISTS;
+                }
+                return EXIT;
         }
     }
 }

@@ -15,6 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SpotifyClient implements MusicServiceClient {
     private static final String DEFAULT_API_MEDIA_HOST = "https://api.spotify.com";
@@ -65,9 +66,19 @@ public class SpotifyClient implements MusicServiceClient {
     }
 
     @Override
-    public List<Playlist> getPlaylists(Category category) {
+    public List<Playlist> getPlaylists(String categoryName) {
+        List<Category> categories = getCategories();
+        List<String> categoryId = categories.stream().filter(e -> e.getName().equals(categoryName)).map(Category::getId).collect(Collectors.toList());
+        if (categoryId.isEmpty()) {
+            System.out.println("Specified id doesn't exist");
+            return Collections.emptyList();
+        }
         try {
-            HttpResponse<String> response = httpClient.send(getRequest(PLAYLISTS_PATH), HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(getRequest(CATEGORIES_PATH + "/" + categoryId.get(0) + "/playlists"), HttpResponse.BodyHandlers.ofString());
+            if(response.body().contains("error")) {
+                System.out.println("Test unpredictable error message");
+                return Collections.emptyList();
+            }
             return Playlist.fromString(response.body());
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
@@ -109,7 +120,7 @@ public class SpotifyClient implements MusicServiceClient {
                             clientMessage = CODE_NOT_FOUND_MESSAGE;
                         } else if (code.startsWith("code=")) {
                             clientMessage = CODE_RECEIVED_MESSAGE;
-                            System.out.println("code received: " + code);
+                            System.out.println("code received");
                         }
                         exchange.sendResponseHeaders(200, clientMessage.length());
                         exchange.getResponseBody().write(clientMessage.getBytes());
@@ -142,12 +153,12 @@ public class SpotifyClient implements MusicServiceClient {
         String accessToken = null;
         String refreshToken = null;
         try {
+//            System.out.println("Making http request for access_token...");
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject jo = JsonParser.parseString(response.body()).getAsJsonObject();
             accessToken = jo.get("access_token").getAsString();
             refreshToken = jo.get("refresh_token").getAsString();
-            System.out.println("response:" + response.body());
-            System.out.println("---SUCCESS---");
+            System.out.println("Success!");
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }

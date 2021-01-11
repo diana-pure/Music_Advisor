@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Album implements Representable {
@@ -21,14 +22,20 @@ public class Album implements Representable {
 
     public static List<Album> fromString(String plain) {
         JsonObject jo = JsonParser.parseString(plain).getAsJsonObject();
-        JsonArray ja = jo.get("albums").getAsJsonObject().get("items").getAsJsonArray();
+        JsonElement je = jo.get("albums");
+        if(je == null) {
+            return Collections.emptyList();
+        }
+        JsonArray ja = je.getAsJsonObject().get("items").getAsJsonArray();
         List<Album> albums = new ArrayList<>(ja.size());
         for (JsonElement e : ja) {
             JsonArray artists = e.getAsJsonObject().get("artists").getAsJsonArray();
             StringBuilder sb = new StringBuilder();
             sb.append("[");
             for (JsonElement artist : artists) {
-                sb.append(artist.getAsJsonObject().get("name")).append(", ");
+                String s = artist.getAsJsonObject().get("name").toString();
+                s = s.substring(1, s.length() - 1);
+                sb.append(s).append(", ");
             }
             sb.delete(sb.length() - 2, sb.length());
             sb.append("]");

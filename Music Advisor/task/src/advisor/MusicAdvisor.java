@@ -1,9 +1,9 @@
 package advisor;
 
-import advisor.model.Category;
 import advisor.model.Representable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import static advisor.CommandType.AUTH;
@@ -22,10 +22,12 @@ public class MusicAdvisor {
     }
 
     public boolean authenticate() {
-        CommandType command = getNextCommand();
+        Map<CommandType, String> cmd = getNextCommand();
+        CommandType command = (CommandType) cmd.keySet().toArray()[0];
         while (command != AUTH && command != EXIT) {
             System.out.println("Please, provide access for application.");
-            command = getNextCommand();
+            cmd = getNextCommand();
+            command = (CommandType) cmd.keySet().toArray()[0];
         }
 
         switch (command) {
@@ -39,7 +41,8 @@ public class MusicAdvisor {
     }
 
     public void getAdvice() {
-        CommandType command = getNextCommand();
+        Map<CommandType, String> cmd = getNextCommand();
+        CommandType command = (CommandType) cmd.keySet().toArray()[0];
         while (command != EXIT) {
             switch (command) {
                 case FEATURED:
@@ -52,14 +55,19 @@ public class MusicAdvisor {
                     print(client.getCategories());
                     break;
                 case PLAYLISTS:
-                    print(client.getPlaylists(new Category("","")));
+                    String param = (String) cmd.values().toArray()[0];
+                    print(client.getPlaylists(param));
             }
-            command = getNextCommand();
+            cmd = getNextCommand();
+            command = (CommandType) cmd.keySet().toArray()[0];
+
         }
     }
 
-    private CommandType getNextCommand() {
-        return CommandType.fromString(scanner.next());
+    private Map<CommandType, String> getNextCommand() {
+        String line = scanner.nextLine();
+        String[] cmd = line.split(" ");
+        return Map.of(CommandType.fromString(cmd[0]), cmd.length > 1 ? line.substring(cmd[0].length() + 1) : "");
     }
 
     private void print(List<? extends Representable> resp) {

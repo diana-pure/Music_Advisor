@@ -9,7 +9,7 @@ import java.util.List;
 public interface MusicServiceClient {
     void authenticate();
     List<Category> getCategories();
-    List<Playlist> getPlaylists(Category category);
+    List<Playlist> getPlaylists(String categoryName);
     List<Playlist> getFeatured();
     List<Album> getNewReleases();
 }
