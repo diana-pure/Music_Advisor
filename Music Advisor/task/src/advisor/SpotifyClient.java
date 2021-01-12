@@ -153,7 +153,6 @@ public class SpotifyClient implements MusicServiceClient {
         String accessToken = null;
         String refreshToken = null;
         try {
-//            System.out.println("Making http request for access_token...");
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject jo = JsonParser.parseString(response.body()).getAsJsonObject();
             accessToken = jo.get("access_token").getAsString();

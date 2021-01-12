@@ -12,6 +12,7 @@ public class Main {
     private static MusicAdvisor getMusicAdvisorWithCustomisedHosts(String[] args) {
         String accessHost = null;
         String resourceHost = null;
+        Integer pageSize = null;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -27,14 +28,20 @@ public class Main {
                         i++;
                     }
                     break;
+                case "-page":
+                    if (i + 1 <= args.length - 1) {
+                        pageSize = Integer.parseInt(args[i + 1]);
+                        i++;
+                    }
+                    break;
 
             }
         }
 
-        if (accessHost == null && resourceHost == null) {
+        if (accessHost == null && resourceHost == null && pageSize == null) {
             return new MusicAdvisor();
         }
 
-        return new MusicAdvisor(accessHost, resourceHost);
+        return new MusicAdvisor(accessHost, resourceHost, pageSize);
     }
 }

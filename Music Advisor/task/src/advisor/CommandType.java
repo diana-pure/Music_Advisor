@@ -6,6 +6,8 @@ public enum CommandType {
     NEW("new"),
     CATEGORIES("categories"),
     PLAYLISTS("playlists"),
+    NEXT_PAGE("next"),
+    PREV_PAGE("prev"),
     EXIT("exit");
 
     private final String name;
@@ -20,6 +22,8 @@ public enum CommandType {
             case "featured": return FEATURED;
             case "new": return NEW;
             case "categories": return CATEGORIES;
+            case "next": return NEXT_PAGE;
+            case "prev": return PREV_PAGE;
             default:
                 if(s.startsWith("playlists")) {
                     return PLAYLISTS;
