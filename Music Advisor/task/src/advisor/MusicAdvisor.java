@@ -1,6 +1,10 @@
 package advisor;
 
 import advisor.model.Representable;
+import advisor.page.Page;
+import advisor.page.PageTurnerHolder;
+import advisor.page.PageTurnerNext;
+import advisor.page.PageTurnerPrev;
 
 import java.util.List;
 import java.util.Map;
@@ -72,28 +76,23 @@ public class MusicAdvisor {
     }
 
     private <T extends Representable> Map<CommandType, String> paginateList(List<T> list) {
-        Page<? extends Representable> page = new Page<>(list, pageSize);
-        print(page.getPageData());
+        PageTurnerHolder<T> pageTurnerHolder = new PageTurnerHolder<>();
+        Page<T> page = new Page<>(list, pageSize);
         print(page);
 
         Map<CommandType, String> cmd = getNextCommand();
         CommandType command = (CommandType) cmd.keySet().toArray()[0];
+
         while (command.equals(NEXT_PAGE) || command.equals(PREV_PAGE)) {
             switch (command) {
                 case NEXT_PAGE:
-                    if (!page.hasNext()) {
-                        System.out.println("No more pages.");
-                        break;
-                    }
-                    print(page.goNext().getPageData());
+                    pageTurnerHolder.hold(PageTurnerNext.getInstance());
+                    page = pageTurnerHolder.turn(page);
                     print(page);
                     break;
                 case PREV_PAGE:
-                    if (!page.hasPrev()) {
-                        System.out.println("No more pages.");
-                        break;
-                    }
-                    print(page.goPrev().getPageData());
+                    pageTurnerHolder.hold(PageTurnerPrev.getInstance());
+                    page = pageTurnerHolder.turn(page);
                     print(page);
                     break;
                 default:
@@ -103,12 +102,6 @@ public class MusicAdvisor {
             command = (CommandType) cmd.keySet().toArray()[0];
         }
         return cmd;
-    }
-
-    private void print(List<? extends Representable> resp) {
-        for (Representable r : resp) {
-            System.out.println(r.represent());
-        }
     }
 
     private void print(Representable r) {

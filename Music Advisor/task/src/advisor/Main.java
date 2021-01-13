@@ -38,10 +38,6 @@ public class Main {
             }
         }
 
-        if (accessHost == null && resourceHost == null && pageSize == null) {
-            return new MusicAdvisor();
-        }
-
         return new MusicAdvisor(accessHost, resourceHost, pageSize);
     }
 }
